@@ -1,3 +1,5 @@
+import collections
+
 def cipher(key, data):
     r = ''
     for i, j in enumerate(data):
@@ -40,6 +42,16 @@ def ultra_decipher(ct):
     return data[res.index(max(res))]
 
 
+def guess_key(ct):
+    r = [0] * len(ct)
+    for i, _ in enumerate(ct):
+        for j in range(i+1, len(ct)):
+            if(ct[i] == ct[j]):
+                r[j-1] += 1
+
+    return r
+
+
 def main():
     with open('in1', 'rb') as inf:
         aux = inf.readlines()
@@ -54,8 +66,9 @@ def main():
 
     print(cipher(key, data))
     print(decipher(key, cipher(key, data)))
-    print(find_key(d, data))
     print(principal_period(find_key(d, data)))
+    print(guess_key(cipher(key, data)))
+
     # print(d)
     # print(ultra_decipher(d))
 
