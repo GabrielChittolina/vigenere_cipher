@@ -1,17 +1,25 @@
 def cipher(key, data):
     r = ''
     for i, j in enumerate(data):
-        r += chr((ord(j) + int(key[i % len(key)])) % 256)
+        r += chr((ord(j) + ord(key[i % len(key)])) % 256)
     return r
+
+def principal_period(s):
+    i = (s+s).find(s, 1, -1)
+    print(s)
+    return None if i == -1 else s[:i]
 
 def decipher(key, data):
     r = ''
-    for _, j in enumerate(data):
-        r += chr((ord(j) - int(key)) % 256)
+    for i, j in enumerate(data):
+        r += chr((ord(j) - ord(key[i % len(key)])) % 256)
     return r
 
 def find_key(ct, t):
-    return ord(ct[0]) - ord(t[0])
+    r = ''
+    for i in range(len(t)):
+        r += chr(ord(ct[i]) - ord(t[i]))
+    return r
 
 def load_words():
     with open('english_words_1000', 'r') as wordsf:
@@ -46,8 +54,9 @@ def main():
         d = inf.read().decode().strip()
 
     print(cipher(key, data))
-    # print(decipher(key, cipher(key, data)))
-    # print(find_key(d, data))
+    print(decipher(key, cipher(key, data)))
+    print(find_key(d, data))
+    print(principal_period(find_key(d, data)))
     # print(d)
     # print(ultra_decipher(d))
 

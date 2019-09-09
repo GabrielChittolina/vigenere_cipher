@@ -1,4 +1,4 @@
-# caesar_cipher
+# vigenere_cipher
 
 * Cipher and decipher bytes with a given key
 * Discover the used key given the original and ciphered bytes
