@@ -6,8 +6,7 @@ def cipher(key, data):
 
 def principal_period(s):
     i = (s+s).find(s, 1, -1)
-    print(s)
-    return None if i == -1 else s[:i]
+    return principal_period(s[:-1]) if i == -1 else s[:i]
 
 def decipher(key, data):
     r = ''
