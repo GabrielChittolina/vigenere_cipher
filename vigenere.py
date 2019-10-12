@@ -1,4 +1,5 @@
 import collections
+import numpy as np
 
 def cipher(key, data):
     r = ''
@@ -45,9 +46,11 @@ def ultra_decipher(ct):
 def guess_key(ct):
     r = [0] * len(ct)
     for i, _ in enumerate(ct):
-        for j in range(i+1, len(ct)):
-            if(ct[i] == ct[j]):
-                r[j-1] += 1
+        for j in range(i + 1, len(ct)):
+            if ct[i] == ct[j]:
+                r[j - i - 1] += 1
+    rr = []
+    avg = np.mean(r[:int(len(r)/10)])
 
     return r
 
@@ -64,10 +67,15 @@ def main():
     with open('out1', 'rb') as inf:
         d = inf.read().decode().strip()
 
+    with open('text_sample', 'rb') as text:
+        tt = text.readlines()
+        tt = tt[0].decode().strip()
+
     print(cipher(key, data))
     print(decipher(key, cipher(key, data)))
     print(principal_period(find_key(d, data)))
-    print(guess_key(cipher(key, data)))
+    
+    guess_key(cipher(key, tt))
 
     # print(d)
     # print(ultra_decipher(d))
