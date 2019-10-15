@@ -1,5 +1,12 @@
-import collections
+from statistics import mode
 import numpy as np
+
+def caesar_decipher(key, data):
+    r = ''
+    for _, j in enumerate(data):
+        r += chr((ord(j) - int(key)) % 256)
+    return r
+
 
 def cipher(key, data):
     r = ''
@@ -28,20 +35,32 @@ def load_words():
         aux = set(wordsf.read().split())
     return aux
 
-def ultra_decipher(ct):
-    data = []
-    for i in range(1, 256):
-        data.append(decipher(i, ct))
+def ultra_decipher(ct, key_l=4):
+    ctt = [''] * key_l
+    for i in range(len(ct)):
+        ctt[i % key_l] += ct[i]
 
-    english_words = load_words()
-    res = [0] * 256
-    for i, sen in enumerate(data):
-        for _, word in enumerate(english_words):
-            if word in sen:
-                res[i] += len(word)
+    count = [[0] * 256] * key_l
 
-    return data[res.index(max(res))]
+    for i, e in enumerate(ctt):
+        for j in e:
+            count[i][ord(j)] += 1
 
+    print(ctt[0])
+
+
+    # data = []
+    # for i in range(1, 256):
+    #     data.append(decipher(i, ct))
+
+    # english_words = load_words()
+    # res = [0] * 256
+    # for i, sen in enumerate(data):
+    #     for _, word in enumerate(english_words):
+    #         if word in sen:
+    #             res[i] += len(word)
+
+    # return data[res.index(max(res))]
 
 def guess_key(ct):
     r = [0] * len(ct)
@@ -52,7 +71,13 @@ def guess_key(ct):
     rr = []
     avg = np.mean(r[:int(len(r)/10)])
 
-    return r
+    for i, e in enumerate(r):
+        if e > avg:
+            rr.append(i)
+    rrr = []
+    for i in range(1, len(rr)):
+        rrr.append(rr[i] - rr[i-1])
+    return mode(rrr)
 
 
 def main():
@@ -74,11 +99,10 @@ def main():
     print(cipher(key, data))
     print(decipher(key, cipher(key, data)))
     print(principal_period(find_key(d, data)))
-    
-    guess_key(cipher(key, tt))
+
+    print(ultra_decipher(cipher(key, data)))
 
     # print(d)
-    # print(ultra_decipher(d))
 
 if __name__ == "__main__":
     main()
