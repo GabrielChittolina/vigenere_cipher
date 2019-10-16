@@ -1,12 +1,12 @@
 from statistics import mode
 import numpy as np
+import copy
 
 def caesar_decipher(key, data):
     r = ''
     for _, j in enumerate(data):
         r += chr((ord(j) - int(key)) % 256)
     return r
-
 
 def cipher(key, data):
     r = ''
@@ -31,29 +31,44 @@ def find_key(ct, t):
     return principal_period(r)
 
 def load_words():
-    with open('english_words_1000', 'r') as wordsf:
+    with open('english_words_10000', 'r') as wordsf:
         aux = set(wordsf.read().split())
     return aux
 
 def ultra_decipher(ct, key_l=4):
+    english_words = load_words()
     ctt = [''] * key_l
     for i in range(len(ct)):
         ctt[i % key_l] += ct[i]
 
-    count = [[0] * 256] * key_l
-
+    count = [[0] * 256 for _ in range(key_l)]
     for i, e in enumerate(ctt):
         for j in e:
             count[i][ord(j)] += 1
 
-    print(ctt[0])
+    for i in count:
+        i = i.sort(reverse=True)
+
+    freq = [0] * 256
+    for _, word in enumerate(english_words):
+        for l in word:
+            freq[ord(l)] += 1
+    freq[ord(' ')] = len(english_words)
+
+    for i in range(key_l):
+        r = []
+        for _ in range(len(freq)):
+            r.append(np.dot(count[i], freq))
+            freq.append(freq.pop(0))
+        print(chr(r.index(min(r))), end='')
+
+    print()
 
 
     # data = []
     # for i in range(1, 256):
     #     data.append(decipher(i, ct))
 
-    # english_words = load_words()
     # res = [0] * 256
     # for i, sen in enumerate(data):
     #     for _, word in enumerate(english_words):
@@ -102,11 +117,9 @@ def main():
 
     print(cipher(key, data))
     print(decipher(key, cipher(key, data)))
-    print(principal_period(find_key(d, data)))
-
-    print(ultra_decipher(cipher(key, data)))
-
-    # print(d)
+    print(find_key(d, data))
+    
+    ultra_decipher(cipher(key, tt), 4)
 
 if __name__ == "__main__":
     main()
