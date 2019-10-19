@@ -46,8 +46,9 @@ def ultra_decipher(ct, key_l=4):
         for j in e:
             count[i][ord(j)] += 1
 
-    for i in count:
-        i = i.sort(reverse=True)
+    for i, e in enumerate(ctt):
+        for j, _ in enumerate(count[i]):
+            count[i][j] = count[i][j] / len(e)
 
     freq = [0] * 256
     for _, word in enumerate(english_words):
@@ -55,36 +56,32 @@ def ultra_decipher(ct, key_l=4):
             freq[ord(l)] += 1
     freq[ord(' ')] = len(english_words)
 
+    freq_t = 0
+    for i in freq:
+        freq_t += i
+
+    for i, _ in enumerate(freq):
+        freq[i] = freq[i] / freq_t
+
+    f_key = ''
     for i in range(key_l):
         r = []
         for _ in range(len(freq)):
             r.append(np.dot(count[i], freq))
             freq.append(freq.pop(0))
-        print(chr(r.index(min(r))), end='')
+        f_key += chr(r.index(max(r)))
+        print(r.index(max(r)))
+    print(f_key)
+    return decipher(f_key, ct)
 
-    print()
-
-
-    # data = []
-    # for i in range(1, 256):
-    #     data.append(decipher(i, ct))
-
-    # res = [0] * 256
-    # for i, sen in enumerate(data):
-    #     for _, word in enumerate(english_words):
-    #         if word in sen:
-    #             res[i] += len(word)
-
-    # return data[res.index(max(res))]
-
-def guess_key(ct):
+def guess_key_len(ct):
     r = [0] * len(ct)
     for i, _ in enumerate(ct):
         for j in range(i + 1, len(ct)):
             if ct[i] == ct[j]:
                 r[j - i - 1] += 1
 
-    avg = np.mean(r[:int(len(r)/10)])
+    avg = np.mean(r[:int(len(r)/15)])
     rr = []
     for i, e in enumerate(r):
         if e > avg:
@@ -119,7 +116,10 @@ def main():
     print(decipher(key, cipher(key, data)))
     print(find_key(d, data))
     
-    ultra_decipher(cipher(key, tt), 4)
+    # kl = guess_key_len(cipher(key, tt))
+
+    with open('out2', 'wb') as outf:
+        outf.write(ultra_decipher(cipher(key, tt), 4).encode())
 
 if __name__ == "__main__":
     main()
